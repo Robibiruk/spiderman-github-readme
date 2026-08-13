@@ -1,0 +1,61 @@
+{
+  "id": "spiderman",
+  "name": "Spider-Verse",
+  "tagline": "Friendly Neighborhood Developer",
+  "inspired_by": "Spider-Man (original graphics only — no copyrighted assets)",
+  "version": "0.1.0",
+  "palette": {
+    "background": "#05070D",
+    "deep_navy": "#081426",
+    "spider_red": "#E62429",
+    "bright_red": "#FF3340",
+    "web_white": "#EAF2FF",
+    "electric_blue": "#1976D2",
+    "muted_blue": "#17365C",
+    "muted_text": "#8B9BB4"
+  },
+  "typography": {
+    "display": "Impact, 'Arial Black', 'Segoe UI', sans-serif",
+    "body": "'Segoe UI', system-ui, sans-serif",
+    "mono": "'Cascadia Code', Consolas, monospace"
+  },
+  "terminology": {
+    "profile": "Hero Identity",
+    "stats_section": "Hero Stats",
+    "commits": "Web Shots",
+    "repositories": "Missions",
+    "pull_requests": "Team-Ups",
+    "issues_closed": "Villains Defeated",
+    "contribution_streak": "Web Streak",
+    "stars": "Citizens Saved",
+    "followers": "Spider-Sense Network",
+    "languages": "Web Arsenal",
+    "most_active_repo": "Current Mission",
+    "total_contributions": "Hero XP",
+    "account_age": "Years in the City",
+    "activity_graph": "Contribution City",
+    "status_online": "Spider-Sense: ONLINE",
+    "status_idle": "Spider-Sense: DORMANT"
+  },
+  "animations": {
+    "level": "always-safe",
+    "methods": ["smil-animate", "smil-animateTransform", "css-in-svg", "staggered-fade", "stroke-draw"],
+    "notes": "No <script> anywhere. All motion is SMIL/CSS-in-SVG so it renders inside GitHub README images."
+  },
+  "structure": [
+    { "section": "hero", "asset": "hero.svg", "animation": "radar-web-spin + city-lights + spider-sense-pulse + name-reveal" },
+    { "section": "hero_identity", "type": "markdown", "title": "🕷️ HERO PROFILE" },
+    { "section": "spider_sense", "asset": "spider-sense.svg", "animation": "radar-ping" },
+    { "section": "hero_stats", "type": "markdown + generated svg", "animation": "none (subtle)" },
+    { "section": "web_arsenal", "asset": "arsenal.svg", "animation": "hub-pulse" },
+    { "section": "web_swing", "asset": "swing.svg", "animation": "window-twinkle" },
+    { "section": "current_mission", "type": "markdown", "title": "🎯 CURRENT MISSION" },
+    { "section": "web_missions", "type": "markdown", "title": "🕸️ WEB MISSIONS" },
+    { "section": "achievements", "asset": "achievements.svg", "animation": "burst-spin" },
+    { "section": "web_arsenal", "type": "markdown", "title": "🕸️ WEB ARSENAL" },
+    { "section": "web_streak", "type": "markdown", "title": "🔥 WEB STREAK" },
+    { "section": "socials", "type": "markdown", "title": "📡 SPIDER-SENSE NETWORK" },
+    { "section": "footer", "asset": "footer.svg", "animation": "web-settle" }
+  ],
+  "attention_rule": "Red is the attention color. Background stays near-black/navy. One animated element per viewport."
+}

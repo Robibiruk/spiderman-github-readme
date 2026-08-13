@@ -1,0 +1,12 @@
+name = "spidey-stats"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+
+# The live badge service fetches GitHub on the server side. Set this secret:
+#   npx wrangler secret put GITHUB_TOKEN
+# A token is required — the contribution calendar is GraphQL-only.
+[vars]
+# Optional comma-separated default arsenal picks when the README URL
+# doesn't already pass ?tools=… (the generator embeds them by default).
+ARSENAL_TOOLS = ""
+BADGE_TTL = "21600"

@@ -1,0 +1,26 @@
+{
+  "name": "spiderman-github-readme",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Client-side generator for animated Spider-Verse GitHub profile READMEs",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "build:icons": "node scripts/build-icons.mjs"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "simple-icons": "^16.28.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

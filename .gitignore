@@ -1,0 +1,19 @@
+# Node
+node_modules/
+dist/
+*.local
+
+# Python (tools/generate.py)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel/
