@@ -205,7 +205,7 @@ export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
   const pcol = [20, 348, 676]
   const prow = [62, 240]
   const pw = 304
-  const ph = 164
+  const ph = 178 // increased from 164 to fit 3 rows
 
   // Spider-Verse palette
   const RED = '#E62429'
@@ -214,9 +214,10 @@ export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
   const TILE_EDGE = '#1C2E50'
   const WEB = '#2A4574'
 
-  const TILE = 52 // square icon tile (no text labels)
-  const GAP = 8 // between tiles
-  const ROW_P = 60 // vertical pitch (TILE + GAP)
+  const TILE = 46 // slightly smaller to fit 4 columns
+  const GAP = 6 // tighter gap
+  const COLS = 4 // max columns per row
+  const ROW_P = 56 // vertical pitch
 
   let panels = ''
   let ti = 0
@@ -227,10 +228,13 @@ export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
     const n = gitems.length
     const glow = g % 2 === 0 ? RED : BLUE
 
-    // Compute centered tile positions (up to 2 rows of 3)
-    const row1 = Math.min(3, n)
-    const row2 = n - row1
-    const rows = row2 <= 0 ? [row1] : [row1, row2]
+    // Compute centered tile positions (up to 3 rows of 4 = 12 tiles per panel)
+    const rows: number[] = []
+    let remaining = n
+    while (remaining > 0 && rows.length < 3) {
+      rows.push(Math.min(COLS, remaining))
+      remaining -= COLS
+    }
     const positions: Array<{ x: number; y: number }> = []
     rows.forEach((cnt, r) => {
       const off = (pw - (cnt * TILE + (cnt - 1) * GAP)) / 2
