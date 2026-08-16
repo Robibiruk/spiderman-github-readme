@@ -1,25 +1,65 @@
 // Live brand-icon loader with localStorage caching.
-// Fetches SVG from jsDelivr CDN (simple-icons@latest) and caches indefinitely.
-// Falls back to the vendored TECH_ICONS / geometric glyphs.
+// Dynamically imports icon modules from @thesvg/icons via jsDelivr CDN and
+// caches the rendered SVG indefinitely. Falls back to the vendored
+// TECH_ICONS / geometric glyphs.
 
 import { TECH_ICONS, iconGlyph } from './icons'
 import { C } from './palette'
 
-const CDN_BASE = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons'
+const CDN_BASE = 'https://cdn.jsdelivr.net/npm/@thesvg/icons@3.3.1/dist'
 const CACHE_PREFIX = 'spidey-icon-'
 const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000 // 30 days
+
+// Alias mapping so our internal keys resolve to the slug @thesvg/icons ships.
+// (mirror of the alias map in scripts/build-icons.mjs — keep in sync)
+const ALIAS: Record<string, string> = {
+  css3: 'css',
+  scikitlearn: 'scikit-learn',
+  huggingface: 'hugging-face',
+  githubactions: 'github-actions',
+  amazonaws: 'amazon-web-services',
+  googlecloud: 'google-cloud',
+  microsoftazure: 'microsoft-azure',
+  visualstudiocode: 'visual-studio-code',
+  visualstudio: 'visual-studio',
+  sublimetext: 'sublime-text',
+  intellijidea: 'intellij-idea',
+  raspberrypi: 'raspberry-pi',
+  godotengine: 'godot',
+  unrealengine: 'unreal-engine',
+  apachecassandra: 'apache-cassandra',
+  amazondynamodb: 'amazon-dynamodb',
+  adobephotoshop: 'photoshop',
+  adobeillustrator: 'illustrator',
+  adobeaftereffects: 'after-effects',
+  adobepremierepro: 'premiere-pro',
+  adobexd: 'adobe-xd',
+  phoenixframework: 'phoenix',
+  apacheairflow: 'apache-airflow',
+  powerbi: 'powerbi',
+  stackoverflow: 'stackoverflow',
+  cplusplus: 'cplusplus',
+  csharp: 'csharp',
+  nextdotjs: 'nextdotjs',
+  nodedotjs: 'nodedotjs',
+}
 
 interface CacheEntry {
   svg: string
   ts: number
 }
 
-/** Normalize a simple-icons slug (lowercase, no dots). */
+/** Resolve an internal slug to the @thesvg/icons module name. */
+function resolveSlug(slug: string): string {
+  const aliased = ALIAS[slug] ?? slug
+  return aliased.toLowerCase().replace(/\./g, '')
+}
+
+/** Read from localStorage cache. */
 export function normSlug(slug: string): string {
   return slug.toLowerCase().replace(/\./g, '')
 }
 
-/** Read from localStorage cache. */
 function getCached(slug: string): string | null {
   try {
     const raw = localStorage.getItem(CACHE_PREFIX + slug)
@@ -35,7 +75,6 @@ function getCached(slug: string): string | null {
   }
 }
 
-/** Write to localStorage cache. */
 function setCached(slug: string, svg: string): void {
   try {
     localStorage.setItem(
@@ -53,7 +92,7 @@ function fallbackSvg(slug: string): string {
   // Try vendored brand path first
   const vendored = TECH_ICONS[norm]
   if (vendored) {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${vendored.path ? `<path d="${vendored.path}" fill="${vendored.hex || C.WHITE}"/>` : ''}</svg>`
+    return `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${vendored.path ? `<path d="${vendored.path}" fill="${vendored.hex ? '#' + vendored.hex : C.WHITE}"/>` : ''}</svg>`
   }
   // Then geometric glyph
   const glyph = iconGlyph(norm, 12, 12, C.WHITE, 1)
@@ -64,35 +103,43 @@ function fallbackSvg(slug: string): string {
   return `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="transparent"/></svg>`
 }
 
-/** Load an icon SVG (24×24 viewBox) for a given slug.
+/**
+ * Load an icon SVG (24×24 viewBox) for a given slug.
  *  - Checks localStorage first
- *  - Fetches from jsDelivr CDN if missing
+ *  - Dynamically imports the @thesvg/icons module from jsDelivr if missing
+ *  - Extracts the exported `svg` string (brand-coloured 256×256) and
+ *    normalises it to a 24×24 viewBox for the tile renderer
  *  - Caches result
- *  - Always returns a valid SVG string (never throws) */
+ *  - Always returns a valid SVG string (never throws)
+ */
 export async function loadIcon(slug: string): Promise<string> {
   const norm = normSlug(slug)
+  const mod = resolveSlug(slug)
 
   // 1) Memory/LocalStorage cache
   const cached = getCached(norm)
   if (cached) return cached
 
-  // 2) Try CDN (simple-icons)
+  // 2) Try dynamic import from @thesvg/icons
   try {
-    const timeout = (AbortSignal as unknown as { timeout?: (ms: number) => AbortSignal })
-      .timeout
-    const signal = timeout ? timeout(15_000) : undefined
-    const res = await fetch(`${CDN_BASE}/${norm}.svg`, { signal })
-    if (res.ok) {
-      const text = await res.text()
-      // simple-icons SVGs are already 24×24 viewBox; just ensure xmlns
-      const svg = text.includes('xmlns')
-        ? text
-        : text.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
-      setCached(norm, svg)
-      return svg
+    const module = await import(`${CDN_BASE}/${mod}.js`)
+    const svg = module.svg
+    if (svg && typeof svg === 'string') {
+      // @thesvg/icons svg is a 256×256 SVG with the brand fill baked in.
+      // Rewrite the viewBox to 0 0 24 24 so the tile renderer scales it
+      // correctly, and ensure xmlns is present.
+      const normalised = svg
+        .replace(/viewBox="[^"]*"/, 'viewBox="0 0 24 24"')
+        .replace(/width="[^"]*"/, 'width="24"')
+        .replace(/height="[^"]*"/, 'height="24"')
+      const withNs = normalised.includes('xmlns')
+        ? normalised
+        : normalised.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
+      setCached(norm, withNs)
+      return withNs
     }
   } catch {
-    // Network error / timeout / CORS — fall through
+    // Network error / timeout / missing module — fall through
   }
 
   // 3) Fallback to vendored / glyph

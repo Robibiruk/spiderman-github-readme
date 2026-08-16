@@ -764,8 +764,10 @@ ${footer}
 
 // ---------------------------------------------------------------- hero template
 
-export function renderHeroSvg(tmpl: string, displayName: string): string {
-  return tmpl.replace(/\{\{DISPLAY_NAME\}\}/g, xmlEsc(displayName))
+export function renderHeroSvg(tmpl: string, displayName: string, role = ''): string {
+  return tmpl
+    .replace(/\{\{DISPLAY_NAME\}\}/g, xmlEsc(displayName))
+    .replace(/\{\{ROLE\}\}/g, xmlEsc(role))
 }
 
 // ---------------------------------------------------------------- README
@@ -773,6 +775,7 @@ export function renderHeroSvg(tmpl: string, displayName: string): string {
 export interface ReadmeOptions {
   username: string
   displayName: string
+  role: string
   bio: string
   projects: Project[]
   socials: Socials
@@ -839,6 +842,12 @@ export function renderReadme(tmpl: string, o: ReadmeOptions): string {
     .split(/\s+/)
     .map((w) => encodeURIComponent(w))
     .join('+')
+  const roleEnc = o.role
+    .trim()
+    .toUpperCase()
+    .split(/\s+/)
+    .map((w) => encodeURIComponent(w))
+    .join('+')
   let out = tmpl
   // Badge mode: swap committed data SVGs for always-live badge URLs served by
   // the Cloudflare Worker. hero.svg stays committed (it has no live stats);
@@ -858,6 +867,8 @@ export function renderReadme(tmpl: string, o: ReadmeOptions): string {
   return out
     .replace(/\{\{DISPLAY_NAME_ENC\}\}/g, typing)
     .replace(/\{\{DISPLAY_NAME\}\}/g, xmlEsc(o.displayName))
+    .replace(/\{\{ROLE_ENC\}\}/g, roleEnc)
+    .replace(/\{\{ROLE\}\}/g, xmlEsc(o.role))
     .replace(/\{\{USERNAME\}\}/g, o.username)
     .replace(/\{\{BIO\}\}/g, xmlEsc(o.bio).replace(/\n/g, '<br>'))
     .replace(/\{\{CURRENT_MISSION\}\}/g, currentMission(o.projects[0], o.username))

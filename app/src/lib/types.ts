@@ -71,6 +71,7 @@ export type StatsMode = 'commit' | 'badge'
 export interface GenOptions {
   username: string
   displayName: string
+  role: string
   bio: string
   projects: Project[]
   socials: Socials

@@ -55,6 +55,7 @@ export async function buildZip(o: GenOptions, data: GitHubData): Promise<Blob> {
   const readme = renderReadme(readmeTmpl, {
     username: o.username,
     displayName: o.displayName,
+    role: o.role,
     bio: o.bio,
     projects: o.projects,
     socials: o.socials,
@@ -62,7 +63,7 @@ export async function buildZip(o: GenOptions, data: GitHubData): Promise<Blob> {
     statsMode: o.statsMode,
     badgeBase: o.badgeBase,
   })
-  const heroSvg = renderHeroSvg(heroTmpl, o.displayName)
+  const heroSvg = renderHeroSvg(heroTmpl, o.displayName, o.role)
 
   const zip = new JSZip()
   zip.file('README.md', readme)

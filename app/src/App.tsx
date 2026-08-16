@@ -29,6 +29,7 @@ function topLang(langs: { name: string; pct: number }[]): [string, number] {
 const INITIAL: GenOptions = {
   username: 'Robibiruk',
   displayName: '',
+  role: '',
   bio: '',
   projects: [],
   socials: { linkedin: '', twitter: '', devto: '', email: '' },
@@ -58,6 +59,7 @@ export default function App() {
       setError(null)
       patch({
         displayName: '',
+        role: '',
         bio: '',
         projects: [],
         socials: { linkedin: '', twitter: '', devto: '', email: '' },
@@ -111,8 +113,8 @@ export default function App() {
   }, [])
 
   const heroSvg = useMemo(
-    () => (templates ? renderHeroSvg(templates.hero, options.displayName) : null),
-    [templates, options.displayName],
+    () => (templates ? renderHeroSvg(templates.hero, options.displayName, options.role) : null),
+    [templates, options.displayName, options.role],
   )
 
   const svgs = useMemo(() => {
@@ -167,6 +169,7 @@ export default function App() {
           <IdentityForm
             username={options.username}
             displayName={options.displayName}
+            role={options.role}
             bio={options.bio}
             onPatch={(p) => patch(p)}
             onSubmit={() => void load()}

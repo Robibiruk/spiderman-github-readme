@@ -23,7 +23,7 @@ export const TECH_ICONS: Record<string, TechIconData> = Object.fromEntries(
 export function techIcon(slug: string, cx: number, cy: number, size = 1.0): string {
   const icon = TECH_ICONS[slug]
   if (!icon) return ''
-  const fill = icon.hex || C.WHITE
+  const fill = icon.hex ? `#${icon.hex}` : C.WHITE
   return `<g transform="translate(${(cx - 12 * size).toFixed(2)}, ${(cy - 12 * size).toFixed(2)}) scale(${size.toFixed(3)})"><path d="${icon.path}" fill="${fill}"/></g>`
 }
 

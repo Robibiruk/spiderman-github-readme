@@ -1,14 +1,15 @@
 interface Props {
   username: string
   displayName: string
+  role: string
   bio: string
-  onPatch: (p: { username?: string; displayName?: string; bio?: string }) => void
+  onPatch: (p: { username?: string; displayName?: string; role?: string; bio?: string }) => void
   onSubmit: () => void
   loading: boolean
   real: boolean
 }
 
-export function IdentityForm({ username, displayName, bio, onPatch, onSubmit, loading, real }: Props) {
+export function IdentityForm({ username, displayName, role, bio, onPatch, onSubmit, loading, real }: Props) {
   return (
     <section className="panel">
       <h2>Identity</h2>
@@ -33,6 +34,15 @@ export function IdentityForm({ username, displayName, bio, onPatch, onSubmit, lo
             value={displayName}
             onChange={(e) => onPatch({ displayName: e.target.value })}
             placeholder="PETER PARKER"
+            spellCheck={false}
+          />
+        </label>
+        <label>
+          Role / title (hero subtitle)
+          <input
+            value={role}
+            onChange={(e) => onPatch({ role: e.target.value })}
+            placeholder="FULL-STACK DEVELOPER · AI ENGINEER"
             spellCheck={false}
           />
         </label>
