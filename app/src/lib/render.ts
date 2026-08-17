@@ -197,15 +197,17 @@ function tileIcon(item: ArsenalItem, cx: number, cy: number): string {
 
 export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
   const W = 1000
-  const H = 520
+  const H = 1100
   const groups = CATS.map((c) => ({ ...c, items: items.filter((i) => i.cat === c.id) }))
   const tag = real ? 'LIVE · TOOL NETWORK' : 'DEMO · TOOL NETWORK'
   const total = items.length
 
-  const pcol = [20, 348, 676]
-  const prow = [62, 240]
-  const pw = 304
-  const ph = 178 // increased from 164 to fit 3 rows
+  // Vertical stack: 6 rows, one category per row
+  const ROW_H = 152
+  const ROW_GAP = 24
+  const PANEL_W = 960
+  const PANEL_X = 20
+  const panelY = (idx: number) => 56 + idx * (ROW_H + ROW_GAP)
 
   // Spider-Verse palette
   const RED = '#E62429'
@@ -214,88 +216,96 @@ export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
   const TILE_EDGE = '#1C2E50'
   const WEB = '#2A4574'
 
-  const TILE = 46 // slightly smaller to fit 4 columns
-  const GAP = 6 // tighter gap
-  const COLS = 4 // max columns per row
-  const ROW_P = 56 // vertical pitch
+  const TILE_BASE = 40
+  const GAP_BASE = 8
+  const COLS = 8 // unused — kept for reference
 
   let panels = ''
   let ti = 0
   groups.forEach(({ title, color, items: gitems }, g) => {
     const cat = title.replace(/&/g, '&amp;')
-    const px = pcol[g % 3]
-    const py = prow[Math.floor(g / 3)]
+    const py = panelY(g)
     const n = gitems.length
     const glow = g % 2 === 0 ? RED : BLUE
 
-    // Compute centered tile positions (up to 3 rows of 4 = 12 tiles per panel)
-    const rows: number[] = []
-    let remaining = n
-    while (remaining > 0 && rows.length < 3) {
-      rows.push(Math.min(COLS, remaining))
-      remaining -= COLS
-    }
+    // Horizontal tile layout — auto-shrink so the full row always fits within PANEL_W.
+    // With PANEL_W=960, PANEL_X=20, we have ~928px usable.
+    // For very large categories (like tools with 62 items), we cap the visible row
+    // and show a '+N more' overflow indicator.
+    const usableW = PANEL_W - 32
+    const maxVisible = n > 40 ? 40 : n
+    const finalGap = GAP_BASE
+    const finalTile = maxVisible > 16 ? Math.max(20, Math.floor((usableW - (maxVisible - 1) * finalGap) / maxVisible)) : TILE_BASE
+    const totalW = n * finalTile + (n - 1) * finalGap
+    const off = Math.max(0, (PANEL_W - totalW) / 2)
     const positions: Array<{ x: number; y: number }> = []
-    rows.forEach((cnt, r) => {
-      const off = (pw - (cnt * TILE + (cnt - 1) * GAP)) / 2
-      const ty = py + 48 + r * ROW_P
-      for (let c = 0; c < cnt; c++) {
-        positions.push({ x: px + off + c * (TILE + GAP) + TILE / 2, y: ty + TILE / 2 })
-      }
-    })
+    for (let c = 0; c < n; c++) {
+      const clipped = c < maxVisible
+      const x = clipped ? PANEL_X + off + c * (finalTile + finalGap) + finalTile / 2 : PANEL_X + PANEL_W - finalTile / 2 - 8
+      positions.push({ x, y: py + ROW_H / 2, clipped })
+    }
 
     // Web-line connections between tiles
     let web = ''
     for (let i = 0; i < positions.length - 1; i++) {
       const a = positions[i]
       const b = positions[i + 1]
-      web +=
-        `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="${WEB}" stroke-width="1" stroke-dasharray="3,5" stroke-opacity="0.5">` +
-        `<animate attributeName="stroke-opacity" values="0.15;0.7;0.15" dur="2.4s" begin="${(0.5 + 0.12 * i).toFixed(2)}s" repeatCount="indefinite"/>` +
-        `</line>`
+      const dx = Math.abs(a.x - b.x)
+      // Only draw web lines that are close enough to look connected
+      if (dx < finalTile + finalGap + 10) {
+        web +=
+          `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="${WEB}" stroke-width="1" stroke-dasharray="3,5" stroke-opacity="0.5">` +
+          `<animate attributeName="stroke-opacity" values="0.15;0.7;0.15" dur="2.4s" begin="${(0.5 + 0.12 * i).toFixed(2)}s" repeatCount="indefinite"/>` +
+          `</line>`
+      }
     }
 
     // Brand-colored icon tiles
     let tiles = ''
     positions.forEach((p, i) => {
       const item = gitems[i]
-      const x = p.x - TILE / 2
-      const y = p.y - TILE / 2
+      const x = p.x - (p.clipped ? 20 : finalTile) / 2
+      const y = p.y - (p.clipped ? 20 : finalTile) / 2
+      const sz = p.clipped ? 20 : finalTile
       const d = (0.35 + 0.06 * ti).toFixed(2)
       tiles +=
         `<g opacity="0"><animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="${d}s" fill="freeze"/>` +
-        `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${TILE}" height="${TILE}" rx="13" fill="${TILE_BG}" stroke="${TILE_EDGE}" stroke-width="1.2"/>` +
-        `<rect x="${(x + 2.5).toFixed(1)}" y="${(y + 2.5).toFixed(1)}" width="${TILE - 5}" height="${TILE - 5}" rx="11" fill="none" stroke="${glow}" stroke-opacity="0.26" stroke-width="0.8"/>` +
-        `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${TILE}" height="${TILE}" rx="13" fill="none" stroke="${glow}" stroke-width="1.4" stroke-opacity="0">` +
-        `<animate attributeName="stroke-opacity" values="0;0.65;0" dur="2.6s" begin="${(0.9 + 0.08 * ti).toFixed(2)}s" repeatCount="indefinite"/>` +
-        `</rect>` +
-        tileIcon(item, p.x, p.y) +
+        (p.clipped
+          ? `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="20" height="20" rx="6" fill="${TILE_BG}" stroke="${TILE_EDGE}" stroke-width="1"/>` +
+            `<text x="${p.x.toFixed(1)}" y="${(p.y + 5).toFixed(1)}" text-anchor="middle" font-family="${FONT_MONO}" font-size="7" fill="${C.MUTED}">+${n - maxVisible}</text>`
+          : `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${sz}" height="${sz}" rx="${Math.min(13, sz * 0.3)}" fill="${TILE_BG}" stroke="${TILE_EDGE}" stroke-width="1.2"/>` +
+            `<rect x="${(x + 2.5).toFixed(1)}" y="${(y + 2.5).toFixed(1)}" width="${(sz - 5).toFixed(1)}" height="${(sz - 5).toFixed(1)}" rx="${Math.min(11, (sz - 5) * 0.3)}" fill="none" stroke="${glow}" stroke-opacity="0.26" stroke-width="0.8"/>` +
+            `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${sz}" height="${sz}" rx="${Math.min(13, sz * 0.3)}" fill="none" stroke="${glow}" stroke-width="1.4" stroke-opacity="0">` +
+            `<animate attributeName="stroke-opacity" values="0;0.65;0" dur="2.6s" begin="${(0.9 + 0.08 * ti).toFixed(2)}s" repeatCount="indefinite"/>` +
+            `</rect>` +
+            tileIcon(item, p.x, p.y)) +
         `</g>`
       ti += 1
     })
 
     panels +=
       `<g opacity="0"><animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="${(0.15 + 0.1 * g).toFixed(2)}s" fill="freeze"/>` +
-      `<rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx="16" fill="${TILE_BG}" fill-opacity="0.6" stroke="${TILE_EDGE}" stroke-width="1"/>` +
-      `<rect x="${px}" y="${py}" width="${pw}" height="3" rx="1.5" fill="${color}" fill-opacity="0.85"/>` +
-      `<circle cx="${px + 16}" cy="${py + 19}" r="3" fill="${color}"><animate attributeName="opacity" values="1;0.3;1" dur="2.2s" begin="${(0.5 + 0.15 * g).toFixed(2)}s" repeatCount="indefinite"/></circle>` +
-      `<text x="${px + 27}" y="${py + 23}" font-family="${FONT_MONO}" font-size="11" font-weight="bold" letter-spacing="2" fill="${C.WHITE}">${cat}</text>` +
-      `<text x="${px + pw - 16}" y="${py + 23}" text-anchor="end" font-family="${FONT_MONO}" font-size="9" letter-spacing="1" fill="${C.MUTED}">${n} TOOLS</text>` +
-      `<line x1="${px + 16}" y1="${py + 34}" x2="${px + pw - 16}" y2="${py + 34}" stroke="${TILE_EDGE}" stroke-width="1"/>` +
+      `<rect x="${PANEL_X}" y="${py}" width="${PANEL_W}" height="${ROW_H}" rx="16" fill="${TILE_BG}" fill-opacity="0.6" stroke="${TILE_EDGE}" stroke-width="1"/>` +
+      `<rect x="${PANEL_X}" y="${py}" width="${PANEL_W}" height="3" rx="1.5" fill="${color}" fill-opacity="0.85"/>` +
+      `<circle cx="${PANEL_X + 16}" cy="${py + 19}" r="3" fill="${color}"><animate attributeName="opacity" values="1;0.3;1" dur="2.2s" begin="${(0.5 + 0.15 * g).toFixed(2)}s" repeatCount="indefinite"/></circle>` +
+      `<text x="${PANEL_X + 27}" y="${py + 23}" font-family="${FONT_MONO}" font-size="11" font-weight="bold" letter-spacing="2" fill="${C.WHITE}">${cat}</text>` +
+      `<text x="${PANEL_X + PANEL_W - 16}" y="${py + 23}" text-anchor="end" font-family="${FONT_MONO}" font-size="9" letter-spacing="1" fill="${C.MUTED}">${n} TOOLS</text>` +
+      `<line x1="${PANEL_X + 16}" y1="${py + 34}" x2="${PANEL_X + PANEL_W - 16}" y2="${py + 34}" stroke="${TILE_EDGE}" stroke-width="1"/>` +
       web +
       (n
         ? tiles
-        : `<text x="${(px + pw / 2).toFixed(1)}" y="${(py + ph / 2 + 6).toFixed(1)}" text-anchor="middle" font-family="${FONT_MONO}" font-size="10" letter-spacing="1.5" fill="${C.MUTED}" fill-opacity="0.45">NO TOOLS LOGGED</text>`) +
+        : `<text x="${(PANEL_X + PANEL_W / 2).toFixed(1)}" y="${(py + ROW_H / 2 + 6).toFixed(1)}" text-anchor="middle" font-family="${FONT_MONO}" font-size="10" letter-spacing="1.5" fill="${C.MUTED}" fill-opacity="0.45">NO TOOLS LOGGED</text>`) +
       `</g>`
   })
 
+  const footerY = 56 + 6 * (ROW_H + ROW_GAP) + 10
   const footer =
-    `<line x1="30" y1="452" x2="970" y2="452" stroke="${RED}" stroke-width="2" stroke-opacity="0.3"/>` +
-    `<text x="40" y="478" font-family="${FONT_MONO}" font-size="11" letter-spacing="3" fill="${C.MUTED}">ARSENAL</text>` +
-    `<text x="132" y="478" font-family="${FONT_DISPLAY}" font-size="18" letter-spacing="1" fill="${C.WHITE}">${total} TOOLS ONLINE</text>` +
-    `<circle cx="480" cy="474" r="3.4" fill="#2BD576"><animate attributeName="opacity" values="1;0.35;1" dur="1.8s" repeatCount="indefinite"/></circle>` +
-    `<text x="492" y="478" font-family="${FONT_MONO}" font-size="11" letter-spacing="2" fill="#2BD576">ARSENAL READY</text>` +
-    `<text x="970" y="478" text-anchor="end" font-family="${FONT_MONO}" font-size="10" letter-spacing="1" fill="${C.MUTED}">${tag}</text>`
+    `<line x1="30" y1="${footerY - 10}" x2="970" y2="${footerY - 10}" stroke="${RED}" stroke-width="2" stroke-opacity="0.3"/>` +
+    `<text x="40" y="${footerY + 16}" font-family="${FONT_MONO}" font-size="11" letter-spacing="3" fill="${C.MUTED}">ARSENAL</text>` +
+    `<text x="132" y="${footerY + 16}" font-family="${FONT_DISPLAY}" font-size="18" letter-spacing="1" fill="${C.WHITE}">${total} TOOLS ONLINE</text>` +
+    `<circle cx="480" cy="${footerY + 12}" r="3.4" fill="#2BD576"><animate attributeName="opacity" values="1;0.35;1" dur="1.8s" repeatCount="indefinite"/></circle>` +
+    `<text x="492" y="${footerY + 16}" font-family="${FONT_MONO}" font-size="11" letter-spacing="2" fill="#2BD576">ARSENAL READY</text>` +
+    `<text x="970" y="${footerY + 16}" text-anchor="end" font-family="${FONT_MONO}" font-size="10" letter-spacing="1" fill="${C.MUTED}">${tag}</text>`
   const header =
     `<text x="30" y="42" font-family="${FONT_DISPLAY}" font-size="22" letter-spacing="3" fill="${C.WHITE}">WEB ARSENAL</text>` +
     `<text x="226" y="44" font-family="${FONT_MONO}" font-size="11" letter-spacing="2" fill="${C.MUTED}">// TOOL NETWORK</text>` +
@@ -315,14 +325,12 @@ export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
 <rect width="${W}" height="${H}" rx="16" fill="url(#arsRed)"/>
 <rect width="${W}" height="${H}" rx="16" fill="url(#arsBlue)"/>
 <g stroke="${C.WHITE}" stroke-opacity="0.03" stroke-width="1" fill="none">
-<line x1="0" y1="0" x2="1000" y2="520"/><line x1="1000" y1="0" x2="0" y2="520"/>
-<circle cx="500" cy="260" r="210"/><circle cx="500" cy="260" r="340"/>
+<line x1="0" y1="0" x2="1000" y2="${H}"/><line x1="1000" y1="0" x2="0" y2="${H}"/>
 </g>
 ${header}
 ${panels}
 ${footer}
-</svg>
-`
+</svg>`
 }
 
 // ---------------------------------------------------------------- achievements
