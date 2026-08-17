@@ -3,6 +3,11 @@ node_modules/
 dist/
 *.local
 
+# Environment
+.env
+.env.local
+.env.*.local
+
 # Python (tools/generate.py)
 __pycache__/
 *.pyc
