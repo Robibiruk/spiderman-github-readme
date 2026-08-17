@@ -1,60 +1,178 @@
-# 🕷️ Spider-Man GitHub Profile Generator
+<!-- 🕷️ SPIDER-MAN GITHUB PROFILE GENERATOR -->
+<!-- Animated README — all motion is SMIL/CSS-in-SVG so it renders everywhere -->
 
-Turn your GitHub profile into an animated, Spider-Verse comic-book README — with zero backend and two ways to keep the stats fresh.
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Impact&weight=900&size=42&duration=3000&pause=1.5&color=E62429&center=true&vCenter=true&multiline=true&repeat=true&width=750&height=100&lines=SPIDER-MAN+GITHUB+PROFILE;GENERATOR" alt="Spider-Man GitHub Profile Generator" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/🕷️-SPIDER_VERSE_THEME-E62429?style=for-the-badge&labelColor=05070d" alt="Spider-Verse Theme" />
+  <img src="https://img.shields.io/badge/⚡-ANIMATED_SVGs-1976D2?style=for-the-badge&labelColor=05070d" alt="Animated SVGs" />
+  <img src="https://img.shields.io/badge/🔥-LIVE_STATS-2BD576?style=for-the-badge&labelColor=05070d" alt="Live Stats" />
+  <img src="https://img.shields.io/badge/☁️-CLOUDFLARE_WORKER-E62429?style=for-the-badge&labelColor=05070d" alt="Cloudflare Worker" />
+</p>
+
+<p align="center">
+  <sub>Turn your GitHub profile into an animated, Spider-Verse comic-book README — with <b>zero backend</b> and <b>two ways</b> to keep the stats fresh.</sub>
+</p>
+
+---
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     ANIMATED HERO — the same SVG your profile README gets
+     ════════════════════════════════════════════════════════════════════════ -->
+
+<p align="center">
+  <img src="assets/hero.svg" alt="Spider-Sense: Your Friendly Neighborhood Developer" width="100%"/>
+</p>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     LIVE DEMO — real stats rendered by YOUR worker (if deployed)
+     ════════════════════════════════════════════════════════════════════════ -->
+
+## 🕸️ See it live — real stats, real-time
+
+<sub>These badges pull live data from your GitHub profile via the Cloudflare Worker. No stale screenshots — the numbers you see are right now.</p>
+
+<p align="center">
+  <img src="assets/hero-stats.svg" alt="Hero Stats — commits, PRs, streak, stars" width="100%"/>
+</p>
+
+<p align="center">
+  <img src="assets/streak-stats.svg" alt="Web Streak — current and longest contribution streak" width="100%"/>
+</p>
+
+<p align="center">
+  <img src="assets/achievements.svg" alt="Hero Achievements — Spider-Verse comic badges" width="100%"/>
+</p>
+
+<p align="center">
+  <img src="assets/web-arsenal.svg" alt="Web Arsenal — categorized tech toolbox with real brand icons" width="100%"/>
+</p>
+
+<p align="center">
+  <img src="assets/web-swing.svg" alt="Web Swing — 52-week contribution activity skyline" width="100%"/>
+</p>
+
+---
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     HOW IT WORKS — visual pipeline
+     ════════════════════════════════════════════════════════════════════════ -->
+
+## 🕷️ How it works
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│   GENERATE AT  →  Vercel React app (client-side only)      │
-│   DATA SOURCE  →  api.github.com (+ optional read-only PAT)│
-│   OUTPUT       →  .zip with README.md + animated SVGs      │
-│   STAYS FRESH  →  GitHub Action  and/or  Cloudflare Worker │
-└────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   ┌──────────────┐     ┌──────────────┐     ┌──────────────────────────┐   │
+│   │  YOUR DATA   │────▶│  GENERATOR   │────▶│  ANIMATED PROFILE README │   │
+│   │              │     │              │     │                          │   │
+│   │ • Username   │     │ • React + TS │     │ • 9 animated SVGs        │   │
+│   │ • PAT (opt)  │     │ • Client-side│     │ • SMIL animations        │   │
+│   │ • Projects   │     │ • No backend │     │ • Real brand icons       │   │
+│   │ • Socials    │     │ • In-browser │     │ • Categorized arsenal    │   │
+│   └──────────────┘     └──────────────┘     └──────────────────────────┘   │
+│                                                                             │
+│                          ┌──────────────────────┐                           │
+│                          │   TWO WAYS TO STAY   │                           │
+│                          │       FRESH          │                           │
+│                          ├──────────────────────┤                           │
+│                          │                      │                           │
+│                          │  ① GitHub Action     │                           │
+│                          │     Mon & Thu 06:17  │                           │
+│                          │     commits fresh SVGs│                           │
+│                          │                      │                           │
+│                          │  ② Cloudflare Worker │                           │
+│                          │     Live badge URLs  │                           │
+│                          │     Cache: 5 minutes │                           │
+│                          │     Always current   │                           │
+│                          │                      │                           │
+│                          └──────────────────────┘                           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## What you get
+---
 
-- **9 animated SVGs** — hero, spider-sense, hero stats, web streak, web arsenal, 52-week swing, achievements, divider, footer. All motion is SMIL/CSS-in-SVG (no `<script>`), so animations render inside GitHub README images.
-- **Live GitHub stats** — commits, PRs, streak, contributions calendar, language share. Fetched client-side from the GitHub REST + GraphQL APIs. Paste an optional read-only PAT to unlock pinned repositories and your real contribution graph; the token never leaves your browser.
-- **Web Arsenal that categorizes itself** — real language bytes auto-sort into *Programming Languages / AI·ML·DATA / Backend / Frontend / Databases / Tools & DevOps*, plus a curated picker for the tools GitHub can't see (Postman, Power BI, VS Code…).
-- **Two ways to stay fresh** — commit the assets and let the bundled GitHub Action re-render them twice a week, **or** flip the generator to *Live badges* and serve them from a Cloudflare Worker with a server-side token (always current, no Action needed).
+<!-- ════════════════════════════════════════════════════════════════════════
+     FEATURES — animated cards with icons
+     ════════════════════════════════════════════════════════════════════════ -->
 
-## Quickstart (hosted generator)
+## ⚡ Features
 
-1. Open the app in `app/` (or deploy it to Vercel — `vercel.json` is ready).
-2. Enter your GitHub username. Hit **Load data**.
-3. (Optional) paste a read-only PAT to unlock pinned repos + your real contribution graph.
-4. Tune the Missions, Socials, and Web Arsenal panels.
-5. Hit **Download**, unzip into a new `username/username` repo, commit, push. Done.
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🎬 9 Animated SVGs</h3>
+      <p>Hero, spider-sense, hero stats, web streak, web arsenal, 52-week swing, achievements, divider, footer. All motion is <b>SMIL/CSS-in-SVG</b> — no <code>&lt;script&gt;</code>, so animations render inside GitHub README images.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>🔥 Live GitHub Stats</h3>
+      <p>Commits, PRs, streak, contributions calendar, language share. Fetched client-side from the GitHub REST + GraphQL APIs. Paste an optional read-only PAT to unlock pinned repositories and your real contribution graph.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🕸️ Self-Categorizing Arsenal</h3>
+      <p>Real language bytes auto-sort into <i>Programming Languages / AI·ML·DATA / Backend / Frontend / Databases / Tools & DevOps</i>, plus a curated picker for the tools GitHub can't see (Postman, Power BI, VS Code…).</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>☁️ Two Ways to Stay Fresh</h3>
+      <p>Commit the assets and let the bundled GitHub Action re-render them twice a week, <b>or</b> flip the generator to <i>Live badges</i> and serve them from a Cloudflare Worker with a server-side token — always current, no Action needed.</p>
+    </td>
+  </tr>
+</table>
 
-> Prefer offline / no browser? Use the CLI:
-> ```bash
-> python tools/generate.py --username yourname --token ghp_xxx
-> ```
+---
 
-## Auto-setup — no app, username detected for you
+<!-- ════════════════════════════════════════════════════════════════════════
+     QUICKSTART — visual steps
+     ════════════════════════════════════════════════════════════════════════ -->
 
-The same theme can be dropped into **your** profile repo with almost no configuration, because the bundled GitHub Action reads `github.repository_owner` at runtime — in a `username/username` repo that is *always* your username. No hardcoded values, no editing the workflow.
+## 🚀 Quickstart
 
-1. **Create the repo**: a new **public** repo named exactly `yourusername/yourusername` (lowercase).
-2. **Drop in the theme**: clone the zip's contents into the repo root — `README.md`, `assets/`, `theme/`, `tools/`, `.github/workflows/refresh.yml`.
-3. **Enable Actions**: the workflow `refresh.yml` commits and pushes the freshly generated `assets/*.svg` every Monday + Thursday, and uses the repo's auto-provisioned `secrets.GITHUB_TOKEN` (no setup). Run it once from the *Actions* tab to generate your stats immediately.
-4. That's it — the README, the badge URLs, and the auto-refresh all key off `github.repository_owner`, so switching accounts or forking "just works".
+### Option A: Hosted Generator (recommended)
 
-If your display name differs from your username (e.g. *Robert Downey Jr.* vs `rdj`), edit it once in `README.md` — everything else is derived.
-
-## Live badges — always-fresh stats from a Cloudflare Worker
-
-The committed-asset Action is the zero-hosting default. For stats that update the moment you push, the generator can point the README at **live badge URLs** served by a shared Worker (`workers/`) that reuses the exact same renderers, but with a **server-side** token:
-
-```text
-https://spidey-stats.<your-subdomain>.workers.dev/{username}/streak.svg
-https://spidey-stats.<your-subdomain>.workers.dev/{username}/hero-stats.svg
-https://spidey-stats.<your-subdomain>.workers.dev/{username}/achievements.svg
-https://spidey-stats.<your-subdomain>.workers.dev/{username}/arsenal.svg?tools=fastapi,react,...
-https://spidey-stats.<your-subdomain>.workers.dev/{username}/swing.svg
+```bash
+cd app
+npm install
+npm run dev
+# → http://localhost:5173
 ```
 
-**Deploy it (5 minutes, free tier):**
+1. **Enter your GitHub username** → Hit **Load data**
+2. **(Optional)** paste a read-only PAT to unlock pinned repos + your real contribution graph
+3. **Tune** Missions, Socials, and Web Arsenal panels
+4. **Download** → unzip into a new `username/username` repo → commit → push → done
+
+### Option B: CLI (offline / no browser)
+
+```bash
+python tools/generate.py --username yourname --token ghp_xxx
+```
+
+### Option C: Auto-setup (no app, username detected for you)
+
+The bundled GitHub Action reads `github.repository_owner` at runtime — in a `username/username` repo that is *always* your username. No hardcoded values.
+
+1. **Create the repo**: a new **public** repo named exactly `yourusername/yourusername`
+2. **Drop in the theme**: clone the zip's contents into the repo root
+3. **Enable Actions**: run the workflow once from the *Actions* tab
+
+---
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     LIVE BADGES — Cloudflare Worker setup
+     ════════════════════════════════════════════════════════════════════════ -->
+
+## ☁️ Live badges — always-fresh stats from a Cloudflare Worker
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Cache_TTL-5_MINUTES-E62429?style=flat-square&labelColor=05070d" alt="5 minute cache" />
+  <img src="https://img.shields.io/badge/Rate_Limit-5K/hr-1976D2?style=flat-square&labelColor=05070d" alt="5K/hr rate limit" />
+  <img src="https://img.shields.io/badge/Token-Stored_Securely-2BD576?style=flat-square&labelColor=05070d" alt="Secure token" />
+</p>
 
 ```bash
 cd workers
@@ -64,49 +182,173 @@ npx wrangler deploy                    # writes the .workers.dev URL
 npx wrangler secret put GITHUB_TOKEN   # paste a read-only PAT — lives only in Cloudflare
 ```
 
-**Point the generator at it:** in the *Web Arsenal* panel, switch *Stats delivery* to **Live badges** and paste your `https://spidey-stats.….workers.dev` URL. The generator rewrites the README's data-SVG references to badge URLs (and appends your tool picks to the arsenal badge), while `hero.svg` and the static dividers stay committed — they have no live data.
+**Point the generator at it:** in the *Web Arsenal* panel, switch *Stats delivery* to **Live badges** and paste your `https://spidey-stats.….workers.dev` URL. The generator rewrites the README's data-SVG references to badge URLs.
 
-How it behaves: responses are cached 6h via the Cache API, and the underlying GitHub data is shared across all five badges for an hour — so one visitor costs roughly one API burst, not five. Per-IP + per-username throttling and a global cap protect your token's quota. A missing/invalid token, a rate-limit, or an unknown user each render a distinct honest error badge. A badge renders only when the profile fetch succeeds — it never shows demo numbers as if they were live.
+```text
+https://spidey-stats.<your-subdomain>.workers.dev/{username}/streak.svg
+https://spidey-stats.<your-subdomain>.workers.dev/{username}/hero-stats.svg
+https://spidey-stats.<your-subdomain>.workers.dev/{username}/achievements.svg
+https://spidey-stats.<your-subdomain>.workers.dev/{username}/arsenal.svg?tools=fastapi,react,...
+https://spidey-stats.<your-subdomain>.workers.dev/{username}/swing.svg
+```
 
-## Project layout
+---
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     CONTRIBUTION GRAPH — live from GitHub
+     ════════════════════════════════════════════════════════════════════════ -->
+
+## 📊 Contribution Activity
+
+<p align="center">
+  <a href="https://github.com/Robibiruk">
+    <img src="https://github-readme-activity-graph.vercel.app/graph?username=Robibiruk&bg_color=05070d&color=E62429&line=FF3340&point=EAF2FF&area=true&area_color=1976D2&hide_border=true&custom_title=CONTRIBUTION%20ACTIVITY%20GRAPH" alt="Activity Graph" width="100%"/>
+  </a>
+</p>
+
+---
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     TECH STACK — visual badges
+     ════════════════════════════════════════════════════════════════════════ -->
+
+## 🛠️ Tech Stack
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=05070d" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
+  <img src="https://img.shields.io/badge/simple--icons-000000?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwxOS4xOCA2LjM0IDE0Ljc0IDEwLjI3TDE2LjE4IDE2LjE4TDEyIDEyLjc3TDcuODIgMTYuMTguMjYgMTAuMjcgNi4zNCA2LjM0TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==&logoColor=white" alt="Simple Icons" />
+  <img src="https://img.shields.io/badge/JSZip-FF6600?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIwIDE4YzAgMS4xLS45IDItMiAySDZjLTEuMSAwLTItLjktMi0yVjZjMC0xLjEuOS0yIDItMmg3bDUgNXY5ek0xMyA0djVoNUwxMyA0eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=&logoColor=white" alt="JSZip" />
+</p>
+
+---
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PROJECT STRUCTURE — visual tree
+     ════════════════════════════════════════════════════════════════════════ -->
+
+## 🗂️ Project Structure
 
 ```
 spiderman-github-readme/
-├── themes/spiderman/        # theme pack: theme.json + templates + static SVGs
 ├── app/                     # Vercel-ready React generator (Vite + TypeScript)
-│   ├── src/lib/
-│   │   ├── github.ts        # REST + GraphQL data layer (optional PAT)
-│   │   ├── arsenal.ts       # auto-categorization + curated tool picker
-│   │   ├── render.ts        # ports tools/generate.py's 5 SVG builders to TS
-│   │   ├── icons.ts         # vendored simple-icons lookup + monogram glyphs
-│   │   ├── download.ts      # JSZip assembly of the profile .zip
-│   │   └── ...
-│   └── public/              # payload files shipped inside the .zip
+│   ├── src/
+│   │   ├── lib/
+│   │   │   ├── github.ts    # REST + GraphQL data layer (optional PAT)
+│   │   │   ├── arsenal.ts   # Auto-categorization + curated tool picker
+│   │   │   ├── render.ts    # 9 animated SVG builders
+│   │   │   ├── icons.ts     # 144 vendored simple-icons + monogram glyphs
+│   │   │   ├── download.ts  # JSZip assembly of the profile .zip
+│   │   │   └── ...
+│   │   └── components/
+│   └── public/              # Payload files shipped inside the .zip
 ├── workers/                 # Cloudflare Worker (live badge mode)
 │   └── src/index.ts         # GET /{username}/{asset}.svg, server-side token
-├── tools/                   # offline Python CLI (also ships in the .zip)
-└── theme/                   # theme.json reference (copied into themes/)
+├── tools/                   # Offline Python CLI (also ships in the .zip)
+│   ├── generate.py          # The same renderers, in Python
+│   └── tech_icons.py        # simple-icons path data
+├── assets/                  # Pre-generated demo assets
+│   ├── hero.svg             # Animated hero with radar + city lights
+│   ├── hero-stats.svg       # Headline stats + letter-grade rating
+│   ├── streak-stats.svg     # Streak pulse + totals
+│   ├── achievements.svg     # Rank-card achievements + XP bar
+│   ├── web-arsenal.svg      # Categorized toolbox with real brand icons
+│   ├── web-swing.svg        # 52-week activity skyline
+│   ├── spider-sense.svg     # Radar ping status
+│   ├── web-divider.svg      # Animated web divider
+│   └── footer.svg           # Animated footer
+├── theme/
+│   └── theme.json           # Palette tokens, typography, terminology
+├── templates/
+│   ├── README.md.tmpl       # README template with {{PLACEHOLDERS}}
+│   └── hero.svg.tmpl        # Hero SVG template
+└── workflow/
+    └── refresh.yml          # GitHub Action: Mon + Thu 06:17 UTC
 ```
 
-The data SVGs (`hero-stats`, `streak`, `arsenal`, `swing`, `achievements`) share one naming scheme across the app, the CLI, the Action, and the Worker, so the Action refreshes exactly the files the README references.
+---
 
-## Adding your own theme
+<!-- ════════════════════════════════════════════════════════════════════════
+     THEME TOKENS — visual palette
+     ════════════════════════════════════════════════════════════════════════ -->
 
-A theme is a folder under `themes/` with:
+## 🎨 Theme: Spider-Verse
 
-- `theme.json` — palette tokens, typography, Spider-Verse terminology, animation notes
-- `templates/README.md.tmpl` — the README template with `{{PLACEHOLDERS}}`
-- `static/*.svg` — the hand-crafted, non-data SVGs (hero, divider, spider-sense, footer)
+<p align="center">
+  <img src="https://img.shields.io/badge/Background-05070D?style=for-the-badge&labelColor=05070d" alt="Background" />
+  <img src="https://img.shields.io/badge/Deep_Navy-081426?style=for-the-badge&labelColor=081426" alt="Deep Navy" />
+  <img src="https://img.shields.io/badge/Spider_Red-E62429?style=for-the-badge&labelColor=E62429" alt="Spider Red" />
+  <img src="https://img.shields.io/badge/Bright_Red-FF3340?style=for-the-badge&labelColor=FF3340" alt="Bright Red" />
+  <img src="https://img.shields.io/badge/Web_White-EAF2FF?style=for-the-badge&labelColor=EAF2FF&color=05070d" alt="Web White" />
+  <img src="https://img.shields.io/badge/Electric_Blue-1976D2?style=for-the-badge&labelColor=1976D2" alt="Electric Blue" />
+  <img src="https://img.shields.io/badge/Muted_Blue-17365C?style=for-the-badge&labelColor=17365C" alt="Muted Blue" />
+  <img src="https://img.shields.io/badge/Muted_Text-8B9BB4?style=for-the-badge&labelColor=8B9BB4" alt="Muted Text" />
+</p>
 
-The 5 data SVGs are generated at runtime from the theme palette in `render.ts`, so a new palette restyles everything.
+---
 
-## Tech notes
+<!-- ════════════════════════════════════════════════════════════════════════
+     TERMINOLOGY — fun mapping
+     ════════════════════════════════════════════════════════════════════════ -->
 
-- **No backend in the app.** All API calls happen in the browser against `api.github.com`. Rate limit is ~60 req/hr unauthenticated; a read-only PAT (sent straight to GitHub, never stored server-side) raises it and unlocks GraphQL endpoints. The **badge Worker is the one exception**: it holds a single server-side `GITHUB_TOKEN` in Cloudflare secrets.
-- **Icons are vendored** (`src/lib/icons.json`) as a pruned snapshot of [simple-icons](https://github.com/simple-icons/simple-icons) (CC0 1.0). Brands simple-icons removed (AWS, VS Code, Power BI, Matplotlib, Playwright) render as inline monogram glyphs. Run `npm run build:icons` to refresh the dataset.
-- **System fonts only** (Impact, Segoe UI, Consolas) so SVGs render identically everywhere — no font downloads in GitHub image rendering.
-- **Color tokens** live in `theme.json` — red is the attention color, background stays near-black/navy, one animated element per viewport.
+## 🕷️ Spider-Verse Terminology
 
-## License
+| GitHub Default | Spider-Verse |
+|---------------|--------------|
+| Profile | Hero Identity |
+| Stats Section | Hero Stats |
+| Commits | Web Shots |
+| Repositories | Missions |
+| Pull Requests | Team-Ups |
+| Issues Closed | Villains Defeated |
+| Contribution Streak | Web Streak |
+| Stars | Citizens Saved |
+| Followers | Spider-Sense Network |
+| Languages | Web Arsenal |
+| Most Active Repo | Current Mission |
+| Total Contributions | Hero XP |
+| Account Age | Years in the City |
 
-MIT — see [LICENSE](./LICENSE). Theme is inspired by Spider-Man (original graphics only, no copyrighted assets).
+---
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     STATS — live GitHub stats
+     ════════════════════════════════════════════════════════════════════════ -->
+
+## 📈 Project Stats
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/Robibiruk/spiderman-github-readme?style=for-the-badge&color=E62429&labelColor=05070d" alt="Stars" />
+  <img src="https://img.shields.io/github/forks/Robibiruk/spiderman-github-readme?style=for-the-badge&color=1976D2&labelColor=05070d" alt="Forks" />
+  <img src="https://img.shields.io/github/watchers/Robibiruk/spiderman-github-readme?style=for-the-badge&color=2BD576&labelColor=05070d" alt="Watchers" />
+  <img src="https://img.shields.io/github/issues/Robibiruk/spiderman-github-readme?style=for-the-badge&color=FF3340&labelColor=05070d" alt="Issues" />
+  <img src="https://img.shields.io/github/license/Robibiruk/spiderman-github-readme?style=for-the-badge&color=8B9BB4&labelColor=05070d" alt="License" />
+</p>
+
+---
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     FOOTER — animated
+     ════════════════════════════════════════════════════════════════════════ -->
+
+<p align="center">
+  <img src="assets/footer.svg" alt="The web never sleeps. Neither does the developer." width="100%"/>
+</p>
+
+<p align="center">
+  <sub>Generated with the <b>Spider-Man GitHub Profile Generator</b> — your friendly neighborhood README builder.</sub>
+</p>
+
+<p align="center">
+  <img src="https://komarev.com/ghpvc/?username=Robibiruk&color=E62429&style=for-the-badge&label=SPIDER-SENSE+VISITORS&labelColor=05070d" alt="Visitor Count" />
+</p>
+
+<p align="center">
+  <sub>🕷️ <i>"With great code comes great responsibility."</i></sub>
+</p>
