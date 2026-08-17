@@ -89,10 +89,25 @@ function setCached(slug: string, svg: string): void {
 /** Fallback SVG from vendored icons or glyph. */
 function fallbackSvg(slug: string): string {
   const norm = normSlug(slug)
-  // Try vendored brand path first
   const vendored = TECH_ICONS[norm]
-  if (vendored) {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${vendored.path ? `<path d="${vendored.path}" fill="${vendored.hex ? '#' + vendored.hex : C.WHITE}"/>` : ''}</svg>`
+  if (vendored && vendored.svg) {
+    // Keep original viewBox — add/override width/height to 24 and preserveAspectRatio
+    // so the browser scales it correctly to 24×24.
+    let sized = vendored.svg
+      .replace(/preserveAspectRatio="[^"]*"/, 'preserveAspectRatio="xMidYMid meet"')
+    const hasWidth = /width="[^"]*"/.test(sized)
+    const hasHeight = /height="[^"]*"/.test(sized)
+    if (hasWidth) {
+      sized = sized.replace(/width="[^"]*"/, 'width="24"')
+    }
+    if (hasHeight) {
+      sized = sized.replace(/height="[^"]*"/, 'height="24"')
+    }
+    if (!hasWidth || !hasHeight) {
+      sized = sized.replace('<svg', `<svg ${!hasWidth ? 'width="24" ' : ''}${!hasHeight ? 'height="24"' : ''}`)
+    }
+    const withNs = sized.includes('xmlns') ? sized : sized.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
+    return withNs
   }
   // Then geometric glyph
   const glyph = iconGlyph(norm, 12, 12, C.WHITE, 1)
@@ -125,16 +140,22 @@ export async function loadIcon(slug: string): Promise<string> {
     const module = await import(`${CDN_BASE}/${mod}.js`)
     const svg = module.svg
     if (svg && typeof svg === 'string') {
-      // @thesvg/icons svg is a 256×256 SVG with the brand fill baked in.
-      // Rewrite the viewBox to 0 0 24 24 so the tile renderer scales it
-      // correctly, and ensure xmlns is present.
-      const normalised = svg
-        .replace(/viewBox="[^"]*"/, 'viewBox="0 0 24 24"')
-        .replace(/width="[^"]*"/, 'width="24"')
-        .replace(/height="[^"]*"/, 'height="24"')
-      const withNs = normalised.includes('xmlns')
-        ? normalised
-        : normalised.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
+      // Keep original viewBox — add/override width/height to 24 and preserveAspectRatio
+      // so the browser scales it correctly to 24×24.
+      let sized = svg
+        .replace(/preserveAspectRatio="[^"]*"/, 'preserveAspectRatio="xMidYMid meet"')
+      const hasWidth = /width="[^"]*"/.test(sized)
+      const hasHeight = /height="[^"]*"/.test(sized)
+      if (hasWidth) {
+        sized = sized.replace(/width="[^"]*"/, 'width="24"')
+      }
+      if (hasHeight) {
+        sized = sized.replace(/height="[^"]*"/, 'height="24"')
+      }
+      if (!hasWidth || !hasHeight) {
+        sized = sized.replace('<svg', `<svg ${!hasWidth ? 'width="24" ' : ''}${!hasHeight ? 'height="24"' : ''}`)
+      }
+      const withNs = sized.includes('xmlns') ? sized : sized.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
       setCached(norm, withNs)
       return withNs
     }

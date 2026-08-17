@@ -265,7 +265,12 @@ button.ghost:hover:not(:disabled) { border-color: var(--red); filter: none; }
 }
 .tool-cell:hover { border-color: var(--red); color: var(--white); filter: none; }
 .tool-cell.on { border-color: var(--red); color: var(--white); background: rgba(230, 36, 41, 0.12); }
-.tool-cell svg { flex: none; }
+.tool-cell svg {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+}
 .empty-inline { color: var(--muted); font-size: 12px; margin-top: 8px; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
 .seg-btn {

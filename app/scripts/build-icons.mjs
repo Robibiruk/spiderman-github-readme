@@ -17,7 +17,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const OUT = join(here, '..', 'src', 'lib', 'icons.json')
 
 // Full toolbox catalog from arsenal.ts — every slug the Web Arsenal can
-// render. 112 of these have thesvg icons; 4 (powerbi, amazondynamodb,
+// render. 141 of these have thesvg icons; 3 (amazondynamodb,
 // adobepremierepro, adobexd) don't exist in thesvg and fall back to glyphs.
 const ALLOWLIST = [
   // ── Programming Languages ──────────────────────────────────────────────
@@ -218,64 +218,87 @@ const ALIAS = {
 }
 
 /**
- * Read a thesvg icon module and extract title, hex, and a 24×24 path.
- * We prefer the "mono" variant (24×24 viewBox) when present; otherwise we
- * fall back to the "default" variant and pull its first <path d>.
+ * Read a thesvg icon module and extract the icon SVG.
+ * Strategy:
+ *   1. Prefer the "mono" variant — it has viewBox="0 0 24 24" and a single
+ *      <path d="..."/>. We pair it with the `hex` export for a clean brand fill.
+ *   2. Fall back to the "default" variant — has baked-in brand colors but
+ *      often in a non-24×24 viewBox. We store it as-is with the original viewBox.
+ * This gives us the best rendering: mono icons scale perfectly, default icons
+ * retain their multi-color brand identity.
  */
 function iconSource(slug) {
   const file = join(ICONS_DIR, `${slug}.js`)
-  if (!existsSync(file)) return { title: null, hex: null, path: null }
+  if (!existsSync(file)) return { title: null, svg: null, mono: false }
   try {
     const raw = readFileSync(file, 'utf8')
     const titleMatch = raw.match(/export const title = "([^"]+)"/)
     const hexMatch = raw.match(/export const hex = "([^"]+)"/)
+    const hex = hexMatch?.[1] ?? null
+
+    // Try mono variant first (viewBox=24×24, single path)
     const monoMatch = raw.match(/"mono": `([^`]+)`/s)
-    const defaultMatch = raw.match(/"default": `([^`]+)`/s)
-
-    let mono = monoMatch ? monoMatch[1] : null
-    let fallback = defaultMatch ? defaultMatch[1] : null
-    let used = mono
-    if (!mono && fallback) used = fallback
-    if (!used) return { title: titleMatch?.[1] ?? null, hex: hexMatch?.[1] ?? null, path: null }
-
-    const pathMatch = used.match(/<path[^>]*d="([^"]*)"/)
-    return {
-      title: titleMatch?.[1] ?? null,
-      hex: hexMatch?.[1] ?? null,
-      path: pathMatch?.[1] ?? null,
+    if (monoMatch) {
+      const mono = monoMatch[1]
+      const pathMatch = mono.match(/<path[^>]*d="([^"]*)"/)
+      const path = pathMatch?.[1] ?? null
+      if (path) {
+        return {
+          title: titleMatch?.[1] ?? null,
+          svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="${path}" fill="#${hex || '000000'}"/></svg>`,
+          mono: true,
+        }
+      }
     }
+
+    // Fall back to default variant (baked-in brand colors)
+    const defaultMatch = raw.match(/"default": `([^`]+)`/s)
+    if (defaultMatch) {
+      return {
+        title: titleMatch?.[1] ?? null,
+        svg: defaultMatch[1],
+        mono: false,
+      }
+    }
+
+    // Last resort: use the svg export
+    const svgMatch = raw.match(/export const svg = `([^`]+)`/s)
+    if (svgMatch) {
+      return {
+        title: titleMatch?.[1] ?? null,
+        svg: svgMatch[1],
+        mono: false,
+      }
+    }
+
+    return { title: titleMatch?.[1] ?? null, svg: null, mono: false }
   } catch {
-    return { title: null, hex: null, path: null }
+    return { title: null, svg: null, mono: false }
   }
 }
 
 const out = ALLOWLIST.map((slug) => {
   const src = ALIAS[slug] ?? slug
   const icon = iconSource(src)
-  if (!icon.path) {
-    // This icon doesn't exist in thesvg (e.g. powerbi, adobexd). Write it
-    // anyway with empty path so the system knows the slug is valid but falls
-    // back to the geometric glyph renderer.
+  if (!icon.svg) {
     return {
       slug,
       label: slug.toUpperCase(),
-      hex: null,
-      path: null,
+      svg: null,
     }
   }
   return {
     slug,
     label: String(icon.title ?? slug).toUpperCase(),
-    hex: icon.hex,
-    path: icon.path,
+    svg: icon.svg,
   }
 })
 
 mkdirSync(dirname(OUT), { recursive: true })
 writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n')
 
-const withPath = out.filter(i => i.path)
-const withoutPath = out.filter(i => !i.path)
+const withPath = out.filter(i => i.svg)
+const withoutPath = out.filter(i => !i.svg)
 console.log(`Wrote ${out.length} icons to ${OUT}`)
-console.log(`  ${withPath.length} with brand path (from @thesvg/icons)`)
-console.log(`  ${withoutPath.length} without path (fall back to glyph): ${withoutPath.map(i => i.slug).join(', ')}`)
+console.log(`  ${withPath.length} with brand SVG (from @thesvg/icons)`)
+console.log(`  ${withoutPath.length} without SVG (fall back to glyph): ${withoutPath.map(i => i.slug).join(', ')}`)

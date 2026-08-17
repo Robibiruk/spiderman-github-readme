@@ -9,8 +9,7 @@ import { spiderEmblem, starPts } from './draw'
 export interface TechIconData {
   slug: string
   label: string
-  hex: string
-  path: string
+  svg: string | null
 }
 
 const ICONS = iconsData as TechIconData[]
@@ -22,9 +21,25 @@ export const TECH_ICONS: Record<string, TechIconData> = Object.fromEntries(
 /** Simple-icons brand path centered at (cx,cy) and scaled. */
 export function techIcon(slug: string, cx: number, cy: number, size = 1.0): string {
   const icon = TECH_ICONS[slug]
-  if (!icon) return ''
-  const fill = icon.hex ? `#${icon.hex}` : C.WHITE
-  return `<g transform="translate(${(cx - 12 * size).toFixed(2)}, ${(cy - 12 * size).toFixed(2)}) scale(${size.toFixed(3)})"><path d="${icon.path}" fill="${fill}"/></g>`
+  if (!icon || !icon.svg) return ''
+  // Keep the full SVG with its original viewBox. Add/override width/height to 24
+  // and preserveAspectRatio so the browser scales it correctly to 24×24.
+  let sized = icon.svg
+    .replace(/preserveAspectRatio="[^"]*"/, 'preserveAspectRatio="xMidYMid meet"')
+  const hasWidth = /width="[^"]*"/.test(sized)
+  const hasHeight = /height="[^"]*"/.test(sized)
+  if (hasWidth) {
+    sized = sized.replace(/width="[^"]*"/, 'width="24"')
+  }
+  if (hasHeight) {
+    sized = sized.replace(/height="[^"]*"/, 'height="24"')
+  }
+  if (!hasWidth || !hasHeight) {
+    sized = sized.replace('<svg', `<svg ${!hasWidth ? 'width="24" ' : ''}${!hasHeight ? 'height="24"' : ''}`)
+  }
+  // Center the 24×24 icon at (cx, cy), scaled by size.
+  const half = 12 * size
+  return `<g transform="translate(${(cx - half).toFixed(2)}, ${(cy - half).toFixed(2)}) scale(${size.toFixed(3)})">${sized}</g>`
 }
 
 /** Compact geometric glyph (no external assets). Returns '' for unknown keys. */

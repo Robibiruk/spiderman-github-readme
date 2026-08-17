@@ -197,13 +197,13 @@ function tileIcon(item: ArsenalItem, cx: number, cy: number): string {
 
 export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
   const W = 1000
-  const H = 1100
+  const H = 1640
   const groups = CATS.map((c) => ({ ...c, items: items.filter((i) => i.cat === c.id) }))
   const tag = real ? 'LIVE · TOOL NETWORK' : 'DEMO · TOOL NETWORK'
   const total = items.length
 
   // Vertical stack: 6 rows, one category per row
-  const ROW_H = 152
+  const ROW_H = 230
   const ROW_GAP = 24
   const PANEL_W = 960
   const PANEL_X = 20
@@ -218,7 +218,7 @@ export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
 
   const TILE_BASE = 40
   const GAP_BASE = 8
-  const COLS = 8 // unused — kept for reference
+
 
   let panels = ''
   let ti = 0
@@ -228,21 +228,35 @@ export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
     const n = gitems.length
     const glow = g % 2 === 0 ? RED : BLUE
 
-    // Horizontal tile layout — auto-shrink so the full row always fits within PANEL_W.
-    // With PANEL_W=960, PANEL_X=20, we have ~928px usable.
-    // For very large categories (like tools with 62 items), we cap the visible row
-    // and show a '+N more' overflow indicator.
-    const usableW = PANEL_W - 32
-    const maxVisible = n > 40 ? 40 : n
+    // Multi-row tile layout — wrap tiles across 4 rows per panel.
+    // With PANEL_W=960, PANEL_X=20, usableW=928, we fit 19 tiles/row at TILE_BASE=40.
+    // For overflow beyond 4 rows (76 tiles), show a single '+N more' indicator.
+    const ROWS = 4
+    const COLS = 19
+    const maxVisible = ROWS * COLS // 76
     const finalGap = GAP_BASE
-    const finalTile = maxVisible > 16 ? Math.max(20, Math.floor((usableW - (maxVisible - 1) * finalGap) / maxVisible)) : TILE_BASE
-    const totalW = n * finalTile + (n - 1) * finalGap
-    const off = Math.max(0, (PANEL_W - totalW) / 2)
-    const positions: Array<{ x: number; y: number }> = []
-    for (let c = 0; c < n; c++) {
-      const clipped = c < maxVisible
-      const x = clipped ? PANEL_X + off + c * (finalTile + finalGap) + finalTile / 2 : PANEL_X + PANEL_W - finalTile / 2 - 8
-      positions.push({ x, y: py + ROW_H / 2, clipped })
+    const finalTile = TILE_BASE
+    const rowWidth = COLS * finalTile + (COLS - 1) * finalGap // 912px
+    const off = (PANEL_W - rowWidth) / 2 // centered
+    const tileY = py + 44 // below header divider
+    const rowGap = 8
+    const overflowCount = n > maxVisible ? n - maxVisible : 0
+    const visibleCount = n > maxVisible ? maxVisible : n
+    const positions: Array<{ x: number; y: number; clipped: boolean }> = []
+    for (let c = 0; c < visibleCount; c++) {
+      const row = Math.floor(c / COLS)
+      const col = c % COLS
+      const x = PANEL_X + off + col * (finalTile + finalGap) + finalTile / 2
+      const y = tileY + row * (finalTile + rowGap) + finalTile / 2
+      positions.push({ x, y, clipped: false })
+    }
+    // Single overflow indicator at the end of the last row
+    if (overflowCount > 0) {
+      const lastRow = Math.floor((visibleCount - 1) / COLS)
+      const lastCol = (visibleCount - 1) % COLS
+      const x = PANEL_X + off + (lastCol + 1) * (finalTile + finalGap) + finalTile / 2
+      const y = tileY + lastRow * (finalTile + rowGap) + finalTile / 2
+      positions.push({ x, y, clipped: true })
     }
 
     // Web-line connections between tiles
@@ -264,22 +278,27 @@ export function renderArsenalSvg(real: boolean, items: ArsenalItem[]): string {
     let tiles = ''
     positions.forEach((p, i) => {
       const item = gitems[i]
-      const x = p.x - (p.clipped ? 20 : finalTile) / 2
-      const y = p.y - (p.clipped ? 20 : finalTile) / 2
-      const sz = p.clipped ? 20 : finalTile
+      const x = p.x - finalTile / 2
+      const y = p.y - finalTile / 2
       const d = (0.35 + 0.06 * ti).toFixed(2)
-      tiles +=
-        `<g opacity="0"><animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="${d}s" fill="freeze"/>` +
-        (p.clipped
-          ? `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="20" height="20" rx="6" fill="${TILE_BG}" stroke="${TILE_EDGE}" stroke-width="1"/>` +
-            `<text x="${p.x.toFixed(1)}" y="${(p.y + 5).toFixed(1)}" text-anchor="middle" font-family="${FONT_MONO}" font-size="7" fill="${C.MUTED}">+${n - maxVisible}</text>`
-          : `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${sz}" height="${sz}" rx="${Math.min(13, sz * 0.3)}" fill="${TILE_BG}" stroke="${TILE_EDGE}" stroke-width="1.2"/>` +
-            `<rect x="${(x + 2.5).toFixed(1)}" y="${(y + 2.5).toFixed(1)}" width="${(sz - 5).toFixed(1)}" height="${(sz - 5).toFixed(1)}" rx="${Math.min(11, (sz - 5) * 0.3)}" fill="none" stroke="${glow}" stroke-opacity="0.26" stroke-width="0.8"/>` +
-            `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${sz}" height="${sz}" rx="${Math.min(13, sz * 0.3)}" fill="none" stroke="${glow}" stroke-width="1.4" stroke-opacity="0">` +
-            `<animate attributeName="stroke-opacity" values="0;0.65;0" dur="2.6s" begin="${(0.9 + 0.08 * ti).toFixed(2)}s" repeatCount="indefinite"/>` +
-            `</rect>` +
-            tileIcon(item, p.x, p.y)) +
-        `</g>`
+      if (p.clipped) {
+        // Overflow indicator
+        tiles +=
+          `<g opacity="0"><animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="${d}s" fill="freeze"/>` +
+          `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${finalTile}" height="${finalTile}" rx="${Math.min(13, finalTile * 0.3)}" fill="${TILE_BG}" stroke="${TILE_EDGE}" stroke-width="1.2"/>` +
+          `<text x="${p.x.toFixed(1)}" y="${(p.y + 5).toFixed(1)}" text-anchor="middle" font-family="${FONT_MONO}" font-size="11" font-weight="bold" fill="${C.MUTED}">+${overflowCount}</text>` +
+          `</g>`
+      } else {
+        tiles +=
+          `<g opacity="0"><animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="${d}s" fill="freeze"/>` +
+          `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${finalTile}" height="${finalTile}" rx="${Math.min(13, finalTile * 0.3)}" fill="${TILE_BG}" stroke="${TILE_EDGE}" stroke-width="1.2"/>` +
+          `<rect x="${(x + 2.5).toFixed(1)}" y="${(y + 2.5).toFixed(1)}" width="${(finalTile - 5).toFixed(1)}" height="${(finalTile - 5).toFixed(1)}" rx="${Math.min(11, (finalTile - 5) * 0.3)}" fill="none" stroke="${glow}" stroke-opacity="0.26" stroke-width="0.8"/>` +
+          `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${finalTile}" height="${finalTile}" rx="${Math.min(13, finalTile * 0.3)}" fill="none" stroke="${glow}" stroke-width="1.4" stroke-opacity="0">` +
+          `<animate attributeName="stroke-opacity" values="0;0.65;0" dur="2.6s" begin="${(0.9 + 0.08 * ti).toFixed(2)}s" repeatCount="indefinite"/>` +
+          `</rect>` +
+          tileIcon(item, p.x, p.y) +
+          `</g>`
+      }
       ti += 1
     })
 
